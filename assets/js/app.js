@@ -102,7 +102,7 @@ function renderCover() {
   if (!box) return;
 
   if (current && current.cover_image) {
-    box.innerHTML = '<img class="cover" src="' + current.cover_image + '">';
+    box.innerHTML = '<img class="cover" src="' + current.cover_image + '" alt="portada">';
     return;
   }
 
