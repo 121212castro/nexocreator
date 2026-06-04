@@ -80,6 +80,9 @@ function openEditor(draft) {
   current = draft;
   hideAll();
   $('editor').classList.remove('hidden');
+  $('category').value = draft.category || 'pez_marino';
+  $('commonName').value = draft.common_name || '';
+  $('scientificName').value = draft.scientific_name || '';
   renderCover();
 }
 
