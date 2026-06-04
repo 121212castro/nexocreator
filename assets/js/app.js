@@ -83,6 +83,12 @@ function openEditor(draft) {
   $('category').value = draft.category || 'pez_marino';
   $('commonName').value = draft.common_name || '';
   $('scientificName').value = draft.scientific_name || '';
+  const sections = draft.sections || {};
+  $('summary').value = sections.summary || '';
+  $('habitat').value = sections.habitat || '';
+  $('aquarium').value = sections.aquarium || '';
+  $('feeding').value = sections.feeding || '';
+  $('compatibility').value = sections.compatibility || '';
   renderCover();
 }
 
