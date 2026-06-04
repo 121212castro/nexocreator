@@ -107,3 +107,4 @@ window.openEditor = openEditor;
 window.startFromPhoto = startFromPhoto;
 window.removeCover = removeCover;
 window.renderCover = renderCover;
+window.replaceCover = replaceCover;
