@@ -101,6 +101,7 @@ async function replaceCover(ev) {
 
   current.cover_image = await readFile(file);
   renderCover();
+  ev.target.value = '';
 }
 
 function removeCover() {
