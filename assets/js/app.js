@@ -89,6 +89,11 @@ function openEditor(draft) {
   $('aquarium').value = sections.aquarium || '';
   $('feeding').value = sections.feeding || '';
   $('compatibility').value = sections.compatibility || '';
+  $('health').value = sections.health || '';
+  $('purchase').value = sections.purchase || '';
+  $('mistakes').value = sections.mistakes || '';
+  $('curiosities').value = sections.curiosities || '';
+  $('sources').value = sections.sources || '';
   renderCover();
 }
 
