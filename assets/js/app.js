@@ -109,3 +109,4 @@ window.removeCover = removeCover;
 window.renderCover = renderCover;
 window.replaceCover = replaceCover;
 window.all = all;
+window.write = write;
