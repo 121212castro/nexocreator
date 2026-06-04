@@ -97,3 +97,6 @@ function removeCover() {
   current.cover_image = '';
   renderCover();
 }
+
+window.goHome = goHome;
+window.showNew = showNew;
