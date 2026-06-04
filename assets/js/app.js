@@ -9,3 +9,13 @@ function hideAll() {
     $(id).classList.add('hidden');
   });
 }
+
+function goHome() {
+  hideAll();
+  $('home').classList.remove('hidden');
+}
+
+function showNew() {
+  hideAll();
+  $('newMenu').classList.remove('hidden');
+}
