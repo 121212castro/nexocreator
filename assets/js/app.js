@@ -102,3 +102,4 @@ window.goHome = goHome;
 window.showNew = showNew;
 window.hideAll = hideAll;
 window.$ = $;
+window.newDraft = newDraft;
