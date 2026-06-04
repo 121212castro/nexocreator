@@ -105,3 +105,4 @@ window.$ = $;
 window.newDraft = newDraft;
 window.openEditor = openEditor;
 window.startFromPhoto = startFromPhoto;
+window.removeCover = removeCover;
