@@ -41,7 +41,18 @@ function newDraft() {
     common_name: '',
     scientific_name: '',
     cover_image: '',
-    sections: {}
+    sections: {
+      summary: '',
+      habitat: '',
+      aquarium: '',
+      feeding: '',
+      compatibility: '',
+      health: '',
+      purchase: '',
+      mistakes: '',
+      curiosities: '',
+      sources: ''
+    }
   };
 }
 
