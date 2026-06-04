@@ -72,7 +72,8 @@ async function startFromPhoto(ev) {
   const draft = newDraft();
   draft.cover_image = await readFile(file);
 
-  return draft;
+  openEditor(draft);
+  ev.target.value = '';
 }
 
 function openEditor(draft) {
