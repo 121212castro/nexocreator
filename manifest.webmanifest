@@ -1,1 +1,16 @@
-{"name":"NexoCreator","short_name":"NexoCreator","display":"standalone","start_url":"./","background_color":"#062033","theme_color":"#062033"}
+{
+  "name": "NexoCreator",
+  "short_name": "NexoCreator",
+  "display": "standalone",
+  "start_url": "./",
+  "background_color": "#062033",
+  "theme_color": "#062033",
+  "icons": [
+    {
+      "src": "icons/book-fish.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
