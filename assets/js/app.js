@@ -63,3 +63,22 @@ async function startFromPhoto(ev) {
 
   return draft;
 }
+
+function openEditor(draft) {
+  current = draft;
+  hideAll();
+  $('editor').classList.remove('hidden');
+  renderCover();
+}
+
+function renderCover() {
+  const box = $('coverBox');
+  if (!box) return;
+
+  if (current && current.cover_image) {
+    box.innerHTML = '<img class="cover" src="' + current.cover_image + '">';
+    return;
+  }
+
+  box.innerHTML = '<div class="placeholder">Sin foto de portada</div>';
+}
