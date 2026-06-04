@@ -103,3 +103,4 @@ window.showNew = showNew;
 window.hideAll = hideAll;
 window.$ = $;
 window.newDraft = newDraft;
+window.openEditor = openEditor;
