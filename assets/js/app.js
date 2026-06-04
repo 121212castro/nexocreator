@@ -44,3 +44,22 @@ function newDraft() {
     sections: {}
   };
 }
+
+function readFile(file) {
+  return new Promise(function(resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function() { resolve(reader.result); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function startFromPhoto(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+
+  const draft = newDraft();
+  draft.cover_image = await readFile(file);
+
+  return draft;
+}
