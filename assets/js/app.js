@@ -104,3 +104,4 @@ window.hideAll = hideAll;
 window.$ = $;
 window.newDraft = newDraft;
 window.openEditor = openEditor;
+window.startFromPhoto = startFromPhoto;
