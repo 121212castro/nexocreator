@@ -82,3 +82,18 @@ function renderCover() {
 
   box.innerHTML = '<div class="placeholder">Sin foto de portada</div>';
 }
+
+async function replaceCover(ev) {
+  const file = ev.target.files[0];
+  if (!file || !current) return;
+
+  current.cover_image = await readFile(file);
+  renderCover();
+}
+
+function removeCover() {
+  if (!current) return;
+
+  current.cover_image = '';
+  renderCover();
+}
