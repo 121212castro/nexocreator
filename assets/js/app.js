@@ -32,7 +32,6 @@ function rowToDraft(row) {
   };
 }
 
-
 function $(id) {
   return document.getElementById(id);
 }
@@ -74,7 +73,7 @@ async function all() {
 
   if (error) {
     console.error('Error leyendo fichas_creator:', error);
-    alert('No se pudieron cargar las fichas');
+    alert('No se pudieron cargar las fichas: ' + (error.message || JSON.stringify(error)));
     return [];
   }
 
@@ -196,7 +195,7 @@ async function openById(id) {
 
   if (error || !data) {
     console.error('Error abriendo ficha:', error);
-    alert('No se encontró la ficha');
+    alert('No se encontró la ficha: ' + ((error && error.message) || 'sin datos'));
     return;
   }
 
@@ -277,7 +276,7 @@ async function saveFicha(draft) {
 
   if (error) {
     console.error('Error guardando ficha:', error);
-    alert('No se pudo guardar la ficha');
+    alert('No se pudo guardar la ficha: ' + (error.message || JSON.stringify(error)));
     return null;
   }
 
