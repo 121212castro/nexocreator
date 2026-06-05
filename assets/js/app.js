@@ -2,6 +2,7 @@
 
 const KEY = 'nexocreator_fichas_v1';
 const REVIEW_KEY = 'nexocreator_review_queue_v1';
+const ACUARIONEXO_OUTBOX_KEY = 'nexocreator_acuarionexo_outbox_v1';
 
 const STATUS = {
   DRAFT: 'BORRADOR',
@@ -59,6 +60,31 @@ function reviewQueue() {
 
 function writeReviewQueue(arr) {
   writeJson(REVIEW_KEY, arr);
+}
+
+function acuarioNexoOutbox() {
+  return readJson(ACUARIONEXO_OUTBOX_KEY);
+}
+
+function writeAcuarioNexoOutbox(arr) {
+  writeJson(ACUARIONEXO_OUTBOX_KEY, arr);
+}
+
+function upsertById(arr, draft) {
+  const index = arr.findIndex(function(item) {
+    return item.id === draft.id;
+  });
+
+  if (index >= 0) arr[index] = draft;
+  else arr.unshift(draft);
+
+  return arr;
+}
+
+function removeById(arr, id) {
+  return arr.filter(function(item) {
+    return item.id !== id;
+  });
 }
 
 function newDraft() {
@@ -199,14 +225,7 @@ function collect() {
 }
 
 function saveFicha(draft) {
-  const fichas = all();
-  const index = fichas.findIndex(function(item) {
-    return item.id === draft.id;
-  });
-
-  if (index >= 0) fichas[index] = draft;
-  else fichas.unshift(draft);
-
+  const fichas = upsertById(all(), draft);
   write(fichas);
   return draft;
 }
@@ -223,19 +242,48 @@ function sendToReview() {
   draft.review_requested_at = new Date().toISOString();
 
   saveFicha(draft);
-
-  const queue = reviewQueue();
-  const index = queue.findIndex(function(item) {
-    return item.id === draft.id;
-  });
-
-  if (index >= 0) queue[index] = draft;
-  else queue.unshift(draft);
-
-  writeReviewQueue(queue);
+  writeReviewQueue(upsertById(reviewQueue(), draft));
   window.current = draft;
 
   alert('Ficha enviada a revisión');
+  showPreview();
+}
+
+function validateCurrent() {
+  const draft = collect();
+
+  if (draft.status !== STATUS.REVIEW) {
+    alert('Solo se puede validar una ficha en revisión');
+    return;
+  }
+
+  draft.status = STATUS.VALIDATED;
+  draft.validated_at = new Date().toISOString();
+
+  saveFicha(draft);
+  writeReviewQueue(removeById(reviewQueue(), draft.id));
+  window.current = draft;
+
+  alert('Ficha validada');
+  showPreview();
+}
+
+function sendToAcuarioNexo() {
+  const draft = collect();
+
+  if (draft.status !== STATUS.VALIDATED) {
+    alert('Solo se puede enviar a AcuarioNexo una ficha validada');
+    return;
+  }
+
+  draft.status = STATUS.SENT;
+  draft.sent_to_acuarionexo_at = new Date().toISOString();
+
+  saveFicha(draft);
+  writeAcuarioNexoOutbox(upsertById(acuarioNexoOutbox(), draft));
+  window.current = draft;
+
+  alert('Ficha enviada a AcuarioNexo');
   showPreview();
 }
 
@@ -279,10 +327,25 @@ function block(title, content) {
   return '<div class="section"><h2>' + title + '</h2><p>' + escapeHtml(content).replace(/\n/g, '<br>') + '</p></div>';
 }
 
+function transitionButtons(draft) {
+  if (draft.status === STATUS.DRAFT) {
+    return '<button onclick="sendToReview()">Enviar a revisión</button>';
+  }
+
+  if (draft.status === STATUS.REVIEW) {
+    return '<button class="primary" onclick="validateCurrent()">Validar ficha</button>';
+  }
+
+  if (draft.status === STATUS.VALIDATED) {
+    return '<button class="primary" onclick="sendToAcuarioNexo()">Enviar a AcuarioNexo</button>';
+  }
+
+  return '';
+}
+
 function showPreview() {
   const draft = collect();
   const sections = draft.sections;
-  const reviewButton = draft.status === STATUS.REVIEW ? '' : '<button onclick="sendToReview()">Enviar a revisión</button>';
 
   hideAll();
   $('preview').innerHTML =
@@ -301,7 +364,7 @@ function showPreview() {
     block('Curiosidades', sections.curiosities) +
     block('Fuentes', sections.sources) +
     '<button class="primary" onclick="openEditor(window.current)">← Editar</button>' +
-    reviewButton;
+    transitionButtons(draft);
   $('preview').classList.remove('hidden');
 }
 
@@ -331,14 +394,19 @@ window.all = all;
 window.write = write;
 window.reviewQueue = reviewQueue;
 window.writeReviewQueue = writeReviewQueue;
+window.acuarioNexoOutbox = acuarioNexoOutbox;
+window.writeAcuarioNexoOutbox = writeAcuarioNexoOutbox;
 window.collect = collect;
 window.saveDraft = saveDraft;
 window.saveFicha = saveFicha;
 window.sendToReview = sendToReview;
+window.validateCurrent = validateCurrent;
+window.sendToAcuarioNexo = sendToAcuarioNexo;
 window.labelStatus = labelStatus;
 window.labelCat = labelCat;
 window.escapeHtml = escapeHtml;
 window.block = block;
+window.transitionButtons = transitionButtons;
 window.showPreview = showPreview;
 window.exportCurrent = exportCurrent;
 window.current = current;
