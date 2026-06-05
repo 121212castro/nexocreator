@@ -6,19 +6,47 @@ Antes de responder sobre el estado del proyecto, comprobar acceso real y leer ar
 
 No asumir.
 No inventar.
-No decir que no hay acceso sin comprobarlo primero.
+No decir que algo está reparado sin verificarlo primero.
 
-## Objetivo del proyecto
+## Definición oficial del proyecto
 
-NexoCreator es una app independiente para crear fichas visuales y estructuradas.
+NexoCreator es una app independiente para crear fichas visuales y estructuradas, revisarlas, validarlas y enviarlas a AcuarioNexo.
 
-El flujo principal es:
+NexoCreator NO es biblioteca, wiki ni catálogo final.
 
-1. El usuario aporta una foto o datos base.
-2. Se crea una ficha según el tipo correspondiente.
-3. La ficha queda guardada como borrador o ficha terminada.
-4. La ficha exporta un JSON limpio para AcuarioNexo.
-5. AcuarioNexo usa ese JSON como conocimiento estructurado.
+AcuarioNexo es quien recibe las fichas validadas y las usa como conocimiento estructurado.
+
+## Flujo oficial objetivo
+
+1. CREACIÓN: el usuario crea una ficha desde foto, datos base o ficha vacía.
+2. BORRADOR: la ficha queda guardada mientras se edita.
+3. EN_REVISIÓN: la ficha pasa a cola de revisión antes de considerarse válida.
+4. VALIDADA: la ficha revisada queda aprobada para envío.
+5. ENVIADA_A_ACUARIONEXO: la ficha validada se entrega a AcuarioNexo.
+
+Exportar JSON es solo una salida manual. No equivale a enviar a AcuarioNexo.
+
+## Estado real verificado el 2026-06-05
+
+Archivos leídos:
+
+- `index.html`
+- `assets/js/app.js`
+- `PROJECT_STATE.md`
+
+Estado real actual de la app:
+
+- Existe creación de ficha vacía.
+- Existe creación desde foto.
+- Existe guardado local en `localStorage` con clave `nexocreator_fichas_v1`.
+- Existe estado `BORRADOR`.
+- Existe vista previa.
+- Existe exportación manual de JSON.
+- No existe todavía flujo interno de revisión desde la app.
+- No existe todavía estado `VALIDADA` en la app.
+- No existe todavía estado `ENVIADA_A_ACUARIO_NEXO` o `ENVIADA_A_ACUARIONEXO` en la app.
+- No existe todavía integración real de envío a AcuarioNexo.
+- `review_queue/` existe como estructura del proyecto, pero la app actual no la usa todavía.
 
 ## Tipos de ficha previstos
 
@@ -34,53 +62,15 @@ El flujo principal es:
 - Equipamiento
 - Alimento
 
-## Regla de trabajo para nuevas fichas
-
-Cada tipo de ficha debe tener su propia guía de creación.
-
-Las guías deben guardarse en:
-
-`docs/fichas/`
-
-Cada guía debe indicar:
-
-- Qué datos mínimos necesita la ficha.
-- Qué campos visuales debe mostrar.
-- Qué campos debe exportar en JSON.
-- Qué reglas de compatibilidad o uso debe respetar.
-- Qué información debe buscar/verificar la IA.
-- Qué no debe inventar.
-
-## Estado actual conocido
-
-Pendiente de comprobar leyendo archivos reales:
-
-- `index.html`
-- `assets/js/app.js`
-- estructura actual de carpetas
-- duplicados entre `index.html` y `app.js`
-
-## Siguiente tarea exacta
-
-Crear la carpeta de reglas de fichas y empezar por la guía base común:
-
-`docs/fichas/00_GUIA_GENERAL_FICHAS.md`
-
-Después crear guías específicas, empezando por:
-
-1. `pez_marino.md`
-2. `pez_dulce.md`
-3. `coral.md`
-4. `invertebrado.md`
-5. `medicamento.md`
-6. `sal.md`
-
 ## Forma correcta de trabajar
 
-Al iniciar una sesión:
+Cada problema se trata de uno en uno:
 
-1. Leer `PROJECT_STATE.md`.
-2. Leer los archivos reales relacionados con la tarea.
-3. Ejecutar solo la siguiente tarea lógica.
-4. Probar si procede.
-5. Actualizar este archivo con el nuevo estado.
+1. Localizar leyendo archivos reales afectados.
+2. Corregir solo los archivos reales necesarios.
+3. Verificar leyendo de nuevo los archivos modificados.
+4. Cerrar el punto con archivo modificado, cambio realizado y verificación.
+
+## Siguiente punto pendiente
+
+P2. Integrar `review_queue/` en el flujo real de la app, sin crear parches al final de archivos y sin sustituir la app por otra base.
