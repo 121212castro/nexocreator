@@ -13,6 +13,26 @@ const STATUS = {
 
 let current = null;
 
+const supa = window.supabase.createClient(
+  window.ACUARIONEXO_CONFIG.SUPABASE_URL,
+  window.ACUARIONEXO_CONFIG.SUPABASE_KEY
+);
+
+function rowToDraft(row) {
+  return row.ficha_json || {
+    id: row.id,
+    status: row.status,
+    category: row.category,
+    common_name: row.common_name,
+    scientific_name: row.scientific_name,
+    cover_image: row.cover_image,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    sections: {}
+  };
+}
+
+
 function $(id) {
   return document.getElementById(id);
 }
@@ -46,8 +66,19 @@ function writeJson(key, arr) {
   localStorage.setItem(key, JSON.stringify(arr));
 }
 
-function all() {
-  return readJson(KEY);
+async function all() {
+  const { data, error } = await supa
+    .from('fichas_creator')
+    .select('*')
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    console.error('Error leyendo fichas_creator:', error);
+    alert('No se pudieron cargar las fichas');
+    return [];
+  }
+
+  return (data || []).map(rowToDraft);
 }
 
 function write(arr) {
@@ -156,17 +187,20 @@ function openEditor(draft) {
   renderCover();
 }
 
-function openById(id) {
-  const draft = all().find(function(item) {
-    return item.id === id;
-  });
+async function openById(id) {
+  const { data, error } = await supa
+    .from('fichas_creator')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  if (!draft) {
+  if (error || !data) {
+    console.error('Error abriendo ficha:', error);
     alert('No se encontró la ficha');
     return;
   }
 
-  openEditor(draft);
+  openEditor(rowToDraft(data));
 }
 
 function renderCover() {
@@ -224,16 +258,36 @@ function collect() {
   return current;
 }
 
-function saveFicha(draft) {
-  const fichas = upsertById(all(), draft);
-  write(fichas);
+async function saveFicha(draft) {
+  const payload = {
+    id: draft.id,
+    status: draft.status || STATUS.DRAFT,
+    category: draft.category || '',
+    common_name: draft.common_name || '',
+    scientific_name: draft.scientific_name || '',
+    cover_image: draft.cover_image || '',
+    ficha_json: draft,
+    created_at: draft.created_at || new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supa
+    .from('fichas_creator')
+    .upsert(payload, { onConflict: 'id' });
+
+  if (error) {
+    console.error('Error guardando ficha:', error);
+    alert('No se pudo guardar la ficha');
+    return null;
+  }
+
   return draft;
 }
 
-function saveDraft() {
+async function saveDraft() {
   const draft = collect();
-  saveFicha(draft);
-  alert('Ficha guardada');
+  const saved = await saveFicha(draft);
+  if (saved) alert('Ficha guardada');
 }
 
 function sendToReview() {
