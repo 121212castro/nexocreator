@@ -37,6 +37,7 @@ function newDraft() {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    status: 'BORRADOR',
     category: 'pez_marino',
     common_name: '',
     scientific_name: '',
@@ -78,6 +79,7 @@ async function startFromPhoto(ev) {
 
 function openEditor(draft) {
   current = draft;
+  current.status = current.status || 'BORRADOR';
   window.current = current;
 
   hideAll();
@@ -132,6 +134,7 @@ function removeCover() {
 function collect() {
   if (!current) current = newDraft();
 
+  current.status = current.status || 'BORRADOR';
   current.category = $('category').value;
   current.common_name = $('commonName').value.trim();
   current.scientific_name = $('scientificName').value.trim();
