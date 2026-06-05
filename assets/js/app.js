@@ -1,6 +1,14 @@
 // NexoCreator app
 
 const KEY = 'nexocreator_fichas_v1';
+const REVIEW_KEY = 'nexocreator_review_queue_v1';
+
+const STATUS = {
+  DRAFT: 'BORRADOR',
+  REVIEW: 'EN_REVISION',
+  VALIDATED: 'VALIDADA',
+  SENT: 'ENVIADA_A_ACUARIONEXO'
+};
 
 let current = null;
 
@@ -24,12 +32,33 @@ function showNew() {
   $('newMenu').classList.remove('hidden');
 }
 
+function readJson(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  } catch (err) {
+    console.warn('No se pudo leer localStorage:', key, err);
+    return [];
+  }
+}
+
+function writeJson(key, arr) {
+  localStorage.setItem(key, JSON.stringify(arr));
+}
+
 function all() {
-  return JSON.parse(localStorage.getItem(KEY) || '[]');
+  return readJson(KEY);
 }
 
 function write(arr) {
-  localStorage.setItem(KEY, JSON.stringify(arr));
+  writeJson(KEY, arr);
+}
+
+function reviewQueue() {
+  return readJson(REVIEW_KEY);
+}
+
+function writeReviewQueue(arr) {
+  writeJson(REVIEW_KEY, arr);
 }
 
 function newDraft() {
@@ -37,7 +66,7 @@ function newDraft() {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    status: 'BORRADOR',
+    status: STATUS.DRAFT,
     category: 'pez_marino',
     common_name: '',
     scientific_name: '',
@@ -79,7 +108,7 @@ async function startFromPhoto(ev) {
 
 function openEditor(draft) {
   current = draft;
-  current.status = current.status || 'BORRADOR';
+  current.status = current.status || STATUS.DRAFT;
   window.current = current;
 
   hideAll();
@@ -99,6 +128,19 @@ function openEditor(draft) {
   $('curiosities').value = sections.curiosities || '';
   $('sources').value = sections.sources || '';
   renderCover();
+}
+
+function openById(id) {
+  const draft = all().find(function(item) {
+    return item.id === id;
+  });
+
+  if (!draft) {
+    alert('No se encontró la ficha');
+    return;
+  }
+
+  openEditor(draft);
 }
 
 function renderCover() {
@@ -134,7 +176,7 @@ function removeCover() {
 function collect() {
   if (!current) current = newDraft();
 
-  current.status = current.status || 'BORRADOR';
+  current.status = current.status || STATUS.DRAFT;
   current.category = $('category').value;
   current.common_name = $('commonName').value.trim();
   current.scientific_name = $('scientificName').value.trim();
@@ -156,8 +198,7 @@ function collect() {
   return current;
 }
 
-function saveDraft() {
-  const draft = collect();
+function saveFicha(draft) {
   const fichas = all();
   const index = fichas.findIndex(function(item) {
     return item.id === draft.id;
@@ -167,7 +208,44 @@ function saveDraft() {
   else fichas.unshift(draft);
 
   write(fichas);
+  return draft;
+}
+
+function saveDraft() {
+  const draft = collect();
+  saveFicha(draft);
   alert('Ficha guardada');
+}
+
+function sendToReview() {
+  const draft = collect();
+  draft.status = STATUS.REVIEW;
+  draft.review_requested_at = new Date().toISOString();
+
+  saveFicha(draft);
+
+  const queue = reviewQueue();
+  const index = queue.findIndex(function(item) {
+    return item.id === draft.id;
+  });
+
+  if (index >= 0) queue[index] = draft;
+  else queue.unshift(draft);
+
+  writeReviewQueue(queue);
+  window.current = draft;
+
+  alert('Ficha enviada a revisión');
+  showPreview();
+}
+
+function labelStatus(value) {
+  return {
+    BORRADOR: 'Borrador',
+    EN_REVISION: 'En revisión',
+    VALIDADA: 'Validada',
+    ENVIADA_A_ACUARIONEXO: 'Enviada a AcuarioNexo'
+  }[value] || value || 'Borrador';
 }
 
 function labelCat(value) {
@@ -204,13 +282,14 @@ function block(title, content) {
 function showPreview() {
   const draft = collect();
   const sections = draft.sections;
+  const reviewButton = draft.status === STATUS.REVIEW ? '' : '<button onclick="sendToReview()">Enviar a revisión</button>';
 
   hideAll();
   $('preview').innerHTML =
     (draft.cover_image ? '<img class="cover" src="' + draft.cover_image + '">' : '') +
     '<h1>' + escapeHtml(draft.common_name || 'Ficha sin nombre') + '</h1>' +
     '<div class="scientific">' + escapeHtml(draft.scientific_name || '') + '</div>' +
-    '<p class="muted">' + labelCat(draft.category) + '</p>' +
+    '<p class="muted">' + labelCat(draft.category) + ' · Estado: ' + labelStatus(draft.status) + '</p>' +
     block('Resumen rápido', sections.summary) +
     block('Hábitat natural', sections.habitat) +
     block('Acuario recomendado', sections.aquarium) +
@@ -221,7 +300,8 @@ function showPreview() {
     block('Errores frecuentes', sections.mistakes) +
     block('Curiosidades', sections.curiosities) +
     block('Fuentes', sections.sources) +
-    '<button class="primary" onclick="openEditor(window.current)">← Editar</button>';
+    '<button class="primary" onclick="openEditor(window.current)">← Editar</button>' +
+    reviewButton;
   $('preview').classList.remove('hidden');
 }
 
@@ -235,20 +315,27 @@ function exportCurrent() {
   URL.revokeObjectURL(link.href);
 }
 
+window.STATUS = STATUS;
 window.goHome = goHome;
 window.showNew = showNew;
 window.hideAll = hideAll;
 window.$ = $;
 window.newDraft = newDraft;
 window.openEditor = openEditor;
+window.openById = openById;
 window.startFromPhoto = startFromPhoto;
 window.removeCover = removeCover;
 window.renderCover = renderCover;
 window.replaceCover = replaceCover;
 window.all = all;
 window.write = write;
+window.reviewQueue = reviewQueue;
+window.writeReviewQueue = writeReviewQueue;
 window.collect = collect;
 window.saveDraft = saveDraft;
+window.saveFicha = saveFicha;
+window.sendToReview = sendToReview;
+window.labelStatus = labelStatus;
 window.labelCat = labelCat;
 window.escapeHtml = escapeHtml;
 window.block = block;
