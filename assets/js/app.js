@@ -38,14 +38,16 @@ function $(id) {
 }
 
 function hideAll() {
-  ['home','newMenu','editor','list','preview'].forEach(function(id) {
-    $(id).classList.add('hidden');
+  ['home','newMenu','editor','list','preview','authPanel'].forEach(function(id) {
+    const el = $(id);
+    if (el) el.classList.add('hidden');
   });
 }
 
 function goHome() {
   hideAll();
   $('home').classList.remove('hidden');
+  updateAuthStatus();
 }
 
 function showNew() {
@@ -333,6 +335,7 @@ async function sendToAcuarioNexo() {
 
   if (!user) {
     alert('Inicia sesión antes de pasar la ficha a AcuarioNexo');
+    showLogin();
     return;
   }
 
@@ -588,11 +591,149 @@ function installFinalFichaOverrides() {
   };
 }
 
+function ensureAuthPanel() {
+  if ($('authPanel')) return;
+
+  const panel = document.createElement('section');
+  panel.id = 'authPanel';
+  panel.className = 'hidden card';
+  panel.innerHTML = '' +
+    '<h2>Login Supabase</h2>' +
+    '<p class="muted">Usa el mismo correo y contraseña de AcuarioNexo.</p>' +
+    '<input id="authEmail" type="email" placeholder="Correo">' +
+    '<input id="authPassword" type="password" placeholder="Contraseña">' +
+    '<button class="primary" onclick="loginSupabase()">Entrar</button>' +
+    '<button onclick="registerSupabase()">Crear cuenta</button>' +
+    '<button class="small" onclick="goHome()">← Volver</button>' +
+    '<p id="authMessage" class="muted"></p>';
+
+  const app = document.querySelector('.app') || document.body;
+  app.appendChild(panel);
+}
+
+function ensureAuthHomeControls() {
+  const homeCard = document.querySelector('#home .card');
+  if (!homeCard || $('authStatus')) return;
+
+  const status = document.createElement('p');
+  status.id = 'authStatus';
+  status.className = 'muted';
+  status.textContent = 'Comprobando sesión...';
+
+  const loginButton = document.createElement('button');
+  loginButton.id = 'authButton';
+  loginButton.type = 'button';
+  loginButton.textContent = '🔐 Iniciar sesión';
+  loginButton.onclick = showLogin;
+
+  const logoutButton = document.createElement('button');
+  logoutButton.id = 'logoutButton';
+  logoutButton.type = 'button';
+  logoutButton.className = 'small hidden';
+  logoutButton.textContent = 'Cerrar sesión';
+  logoutButton.onclick = logoutSupabase;
+
+  homeCard.insertBefore(logoutButton, homeCard.firstChild);
+  homeCard.insertBefore(loginButton, homeCard.firstChild);
+  homeCard.insertBefore(status, homeCard.firstChild);
+}
+
+function showLogin() {
+  ensureAuthPanel();
+  hideAll();
+  $('authPanel').classList.remove('hidden');
+  if ($('authMessage')) $('authMessage').textContent = '';
+}
+
+async function updateAuthStatus() {
+  ensureAuthHomeControls();
+  const status = $('authStatus');
+  const loginButton = $('authButton');
+  const logoutButton = $('logoutButton');
+  if (!status || !loginButton || !logoutButton) return;
+
+  const { data } = await supa.auth.getUser();
+  const user = data && data.user;
+
+  if (user) {
+    status.textContent = 'Sesión activa: ' + (user.email || user.id);
+    loginButton.classList.add('hidden');
+    logoutButton.classList.remove('hidden');
+  } else {
+    status.textContent = 'Sin sesión activa. Inicia sesión antes de pasar fichas a AcuarioNexo.';
+    loginButton.classList.remove('hidden');
+    logoutButton.classList.add('hidden');
+  }
+}
+
+async function loginSupabase() {
+  const email = $('authEmail') ? $('authEmail').value.trim() : '';
+  const password = $('authPassword') ? $('authPassword').value : '';
+  const msg = $('authMessage');
+
+  if (!email || !password) {
+    if (msg) msg.textContent = 'Introduce correo y contraseña.';
+    return;
+  }
+
+  if (msg) msg.textContent = 'Entrando...';
+  const { error } = await supa.auth.signInWithPassword({ email: email, password: password });
+
+  if (error) {
+    if (msg) msg.textContent = 'No se pudo iniciar sesión: ' + error.message;
+    return;
+  }
+
+  if (msg) msg.textContent = 'Sesión iniciada.';
+  await updateAuthStatus();
+  goHome();
+}
+
+async function registerSupabase() {
+  const email = $('authEmail') ? $('authEmail').value.trim() : '';
+  const password = $('authPassword') ? $('authPassword').value : '';
+  const msg = $('authMessage');
+
+  if (!email || !password) {
+    if (msg) msg.textContent = 'Introduce correo y contraseña.';
+    return;
+  }
+
+  if (msg) msg.textContent = 'Creando cuenta...';
+  const { error } = await supa.auth.signUp({ email: email, password: password });
+
+  if (error) {
+    if (msg) msg.textContent = 'No se pudo crear la cuenta: ' + error.message;
+    return;
+  }
+
+  if (msg) msg.textContent = 'Cuenta creada. Si Supabase pide confirmación, revisa el correo; si no, la sesión queda activa.';
+  await updateAuthStatus();
+}
+
+async function logoutSupabase() {
+  await supa.auth.signOut();
+  await updateAuthStatus();
+  goHome();
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', installFinalFichaOverrides);
+  document.addEventListener('DOMContentLoaded', function() {
+    installFinalFichaOverrides();
+    ensureAuthPanel();
+    ensureAuthHomeControls();
+    updateAuthStatus();
+  });
 } else {
   installFinalFichaOverrides();
+  ensureAuthPanel();
+  ensureAuthHomeControls();
+  updateAuthStatus();
 }
+
+supa.auth.onAuthStateChange(function() {
+  updateAuthStatus();
+});
 
 window.STATUS = STATUS;
 window.goHome = goHome;
@@ -625,4 +766,9 @@ window.block = block;
 window.transitionButtons = transitionButtons;
 window.showPreview = showPreview;
 window.exportCurrent = exportCurrent;
+window.showLogin = showLogin;
+window.loginSupabase = loginSupabase;
+window.registerSupabase = registerSupabase;
+window.logoutSupabase = logoutSupabase;
+window.updateAuthStatus = updateAuthStatus;
 window.current = current;
