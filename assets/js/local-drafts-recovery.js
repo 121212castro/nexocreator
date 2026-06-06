@@ -39,6 +39,12 @@
     writeLocal(arr);
   }
 
+  function getCurrentDraft() {
+    const draft = normalize(window.current || (typeof current !== 'undefined' ? current : null));
+    if (draft) upsertLocal(draft);
+    return draft;
+  }
+
   const previousAll = window.all;
   window.all = async function() {
     const remote = previousAll ? await previousAll() : [];
@@ -87,5 +93,29 @@
     }
 
     if (previousOpenFinalById) return previousOpenFinalById(id);
+  };
+
+  const previousSendToAcuarioNexo = window.sendToAcuarioNexo;
+  window.sendToAcuarioNexo = async function() {
+    const draft = getCurrentDraft();
+
+    if (!draft) {
+      if (previousSendToAcuarioNexo) return previousSendToAcuarioNexo();
+      alert('No hay ficha abierta para pasar a AcuarioNexo');
+      return;
+    }
+
+    const userResult = await supa.auth.getUser();
+    const user = userResult && userResult.data && userResult.data.user;
+
+    if (!user) {
+      alert('Inicia sesión antes de pasar la ficha a AcuarioNexo');
+      if (typeof showLogin === 'function') showLogin();
+      return;
+    }
+
+    window.current = draft;
+    if (typeof current !== 'undefined') current = draft;
+    return previousSendToAcuarioNexo ? previousSendToAcuarioNexo() : null;
   };
 })();
