@@ -319,7 +319,7 @@ function libraryCategory(value) {
 }
 
 async function sendToAcuarioNexo() {
-  const draft = collect();
+  const draft = (window.current && window.current.id) ? window.current : collect();
   const sections = draft.sections || {};
   const title = draft.common_name || draft.scientific_name || 'Ficha sin nombre';
 
