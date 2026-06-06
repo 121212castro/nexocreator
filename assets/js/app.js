@@ -292,54 +292,114 @@ async function saveDraft() {
   if (saved) alert('Ficha guardada');
 }
 
-function sendToReview() {
-  const draft = collect();
-  draft.status = STATUS.REVIEW;
-  draft.review_requested_at = new Date().toISOString();
-
-  saveFicha(draft);
-  writeReviewQueue(upsertById(reviewQueue(), draft));
-  window.current = draft;
-
-  alert('Ficha enviada a revisión');
-  showPreview();
+async function sendToReview() {
+  return sendToAcuarioNexo();
 }
 
-function validateCurrent() {
-  const draft = collect();
+async function validateCurrent() {
+  return sendToAcuarioNexo();
+}
 
-  if (draft.status !== STATUS.REVIEW) {
-    alert('Solo se puede validar una ficha en revisión');
+function libraryCategory(value) {
+  return {
+    pez_marino: 'fish',
+    pez_dulce: 'fish',
+    coral: 'coral',
+    invertebrado: 'invertebrate',
+    planta: 'plant',
+    microfauna: 'other',
+    sal: 'other',
+    medicamento: 'other',
+    alimento: 'other',
+    equipamiento: 'other'
+  }[value] || value || 'other';
+}
+
+async function sendToAcuarioNexo() {
+  const draft = collect();
+  const sections = draft.sections || {};
+  const title = draft.common_name || draft.scientific_name || 'Ficha sin nombre';
+
+  if (!title || title === 'Ficha sin nombre') {
+    alert('Pon al menos un nombre antes de pasar la ficha a AcuarioNexo');
     return;
   }
 
-  draft.status = STATUS.VALIDATED;
-  draft.validated_at = new Date().toISOString();
+  const userResult = await supa.auth.getUser();
+  const user = userResult && userResult.data && userResult.data.user;
 
-  saveFicha(draft);
-  writeReviewQueue(removeById(reviewQueue(), draft.id));
-  window.current = draft;
+  if (!user) {
+    alert('Inicia sesión antes de pasar la ficha a AcuarioNexo');
+    return;
+  }
 
-  alert('Ficha validada');
-  showPreview();
-}
+  const libraryRow = {
+    user_id: user.id,
+    title: title,
+    scientific_name: draft.scientific_name || null,
+    category: libraryCategory(draft.category),
+    description: sections.summary || null,
+    photo_url: finalSpeciesPhoto(draft) || null,
+    feeding: sections.feeding || null,
+    compatibility: sections.compatibility || null,
+    references_text: sections.sources || null,
+    parameters: {},
+    updated_at: new Date().toISOString()
+  };
 
-function sendToAcuarioNexo() {
-  const draft = collect();
+  let existing = null;
 
-  if (draft.status !== STATUS.VALIDATED) {
-    alert('Solo se puede enviar a AcuarioNexo una ficha validada');
+  if (draft.scientific_name) {
+    const foundByScientific = await supa
+      .from('library_entries')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('scientific_name', draft.scientific_name)
+      .limit(1);
+
+    if (foundByScientific.error) {
+      console.error('Error buscando ficha en AcuarioNexo:', foundByScientific.error);
+      alert('No se pudo comprobar si la ficha ya existe en AcuarioNexo: ' + foundByScientific.error.message);
+      return;
+    }
+
+    existing = (foundByScientific.data || [])[0] || null;
+  }
+
+  if (!existing) {
+    const foundByTitle = await supa
+      .from('library_entries')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('title', title)
+      .limit(1);
+
+    if (foundByTitle.error) {
+      console.error('Error buscando ficha por título en AcuarioNexo:', foundByTitle.error);
+      alert('No se pudo comprobar si la ficha ya existe en AcuarioNexo: ' + foundByTitle.error.message);
+      return;
+    }
+
+    existing = (foundByTitle.data || [])[0] || null;
+  }
+
+  const result = existing
+    ? await supa.from('library_entries').update(libraryRow).eq('id', existing.id)
+    : await supa.from('library_entries').insert(libraryRow);
+
+  if (result.error) {
+    console.error('Error pasando ficha a AcuarioNexo:', result.error);
+    alert('No se pudo pasar la ficha a AcuarioNexo: ' + result.error.message);
     return;
   }
 
   draft.status = STATUS.SENT;
   draft.sent_to_acuarionexo_at = new Date().toISOString();
-
-  saveFicha(draft);
-  writeAcuarioNexoOutbox(upsertById(acuarioNexoOutbox(), draft));
+  await saveFicha(draft);
   window.current = draft;
+  current = draft;
 
-  alert('Ficha enviada a AcuarioNexo');
+  alert('Ficha pasada a AcuarioNexo');
   showPreview();
 }
 
@@ -384,19 +444,11 @@ function block(title, content) {
 }
 
 function transitionButtons(draft) {
-  if (draft.status === STATUS.DRAFT) {
-    return '<button onclick="sendToReview()">Enviar a revisión</button>';
+  if (draft.status === STATUS.SENT) {
+    return '<button class="small" disabled>✅ Ya enviada a AcuarioNexo</button>';
   }
 
-  if (draft.status === STATUS.REVIEW) {
-    return '<button class="primary" onclick="validateCurrent()">Validar ficha</button>';
-  }
-
-  if (draft.status === STATUS.VALIDATED) {
-    return '<button class="primary" onclick="sendToAcuarioNexo()">Enviar a AcuarioNexo</button>';
-  }
-
-  return '';
+  return '<button class="primary" onclick="sendToAcuarioNexo()">📲 Pasar a AcuarioNexo</button>';
 }
 
 function showPreview() {
@@ -493,6 +545,7 @@ function installFinalFichaOverrides() {
       '<button class="small" onclick="showList()">← Mis fichas</button>' +
       renderCleanFichaFinal(draft) +
       '<button class="primary" onclick="openEditor(window.current)">✏️ Editar ficha</button>' +
+      transitionButtons(draft) +
       '<button class="small danger" onclick="deleteFicha(\'' + draft.id + '\')">🗑️ Borrar</button>';
     $('preview').classList.remove('hidden');
   };
