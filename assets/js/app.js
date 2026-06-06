@@ -26,6 +26,7 @@ function rowToDraft(row) {
     common_name: row.common_name,
     scientific_name: row.scientific_name,
     cover_image: row.cover_image,
+    species_photo: row.species_photo || '',
     created_at: row.created_at,
     updated_at: row.updated_at,
     sections: {}
@@ -127,6 +128,7 @@ function newDraft() {
     common_name: '',
     scientific_name: '',
     cover_image: '',
+    species_photo: '',
     sections: {
       summary: '',
       habitat: '',
@@ -240,6 +242,7 @@ function collect() {
   current.common_name = $('commonName').value.trim();
   current.scientific_name = $('scientificName').value.trim();
   current.updated_at = new Date().toISOString();
+  current.species_photo = current.species_photo || '';
   current.sections = {
     summary: $('summary').value,
     habitat: $('habitat').value,
@@ -429,6 +432,110 @@ function exportCurrent() {
   link.download = (draft.common_name || 'ficha').toLowerCase().replace(/[^a-z0-9áéíóúñ]+/gi, '-') + '.json';
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+function finalSpeciesPhoto(draft) {
+  return draft.species_photo ||
+    draft.speciesPhoto ||
+    (draft.media && draft.media.species_photo) ||
+    (draft.media && draft.media.speciesPhoto) ||
+    (draft.images && draft.images.species_photo) ||
+    (draft.images && draft.images.speciesPhoto) ||
+    '';
+}
+
+function finalSection(title, content) {
+  if (!content) return '';
+  return '<section class="section fichaFinalSection"><h2>' + escapeHtml(title) + '</h2><p>' + escapeHtml(content).replace(/\n/g, '<br>') + '</p></section>';
+}
+
+function renderCleanFichaFinal(draft) {
+  const sections = draft.sections || {};
+  const speciesPhoto = finalSpeciesPhoto(draft);
+
+  return '' +
+    '<article class="fichaFinal">' +
+      (speciesPhoto ? '<img class="cover" src="' + speciesPhoto + '" alt="foto real de la especie">' : '<div class="placeholder">Sin foto de especie</div>') +
+      finalSection('Resumen rápido', sections.summary) +
+      finalSection('Hábitat natural', sections.habitat) +
+      finalSection('Acuario recomendado', sections.aquarium) +
+      finalSection('Alimentación', sections.feeding) +
+      finalSection('Compatibilidad', sections.compatibility) +
+      finalSection('Salud', sections.health) +
+      finalSection('Antes de comprar', sections.purchase) +
+      finalSection('Errores frecuentes', sections.mistakes) +
+      finalSection('Curiosidades', sections.curiosities) +
+      finalSection('Fuentes', sections.sources) +
+    '</article>';
+}
+
+function installFinalFichaOverrides() {
+  window.renderFichaFinal = renderCleanFichaFinal;
+
+  window.openFinalById = async function(id) {
+    const { data, error } = await supa
+      .from('fichas_creator')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      alert('No se pudo abrir la ficha: ' + ((error && error.message) || 'sin datos'));
+      return;
+    }
+
+    const draft = rowToDraft(data);
+    window.current = draft;
+    current = draft;
+
+    hideAll();
+    $('preview').innerHTML =
+      '<button class="small" onclick="showList()">← Mis fichas</button>' +
+      renderCleanFichaFinal(draft) +
+      '<button class="primary" onclick="openEditor(window.current)">✏️ Editar ficha</button>' +
+      '<button class="small danger" onclick="deleteFicha(\'' + draft.id + '\')">🗑️ Borrar</button>';
+    $('preview').classList.remove('hidden');
+  };
+
+  window.showList = async function() {
+    hideAll();
+    $('list').innerHTML = '<h2>Mis fichas</h2><p class="muted">Cargando...</p>';
+    $('list').classList.remove('hidden');
+
+    const arr = await all();
+    let html = '<h2>Mis fichas</h2>';
+
+    if (!arr.length) {
+      html += '<p class="muted">Aún no hay fichas guardadas.</p>';
+    }
+
+    arr.forEach(function(f) {
+      const cover = f.cover_image
+        ? '<img class="listCover" src="' + f.cover_image + '" alt="portada">'
+        : '<div class="listCoverEmpty">Sin portada</div>';
+
+      html += '' +
+        '<div class="listItem">' +
+          '<div onclick="openFinalById(\'' + f.id + '\')">' +
+            cover +
+            '<div class="listBody">' +
+              '<p class="muted">' + escapeHtml(labelCat(f.category)) + '</p>' +
+              '<button class="primary small" onclick="event.stopPropagation();openFinalById(\'' + f.id + '\')">Ver ficha final</button>' +
+              '<button class="small danger" onclick="event.stopPropagation();deleteFicha(\'' + f.id + '\')">🗑️ Borrar</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    });
+
+    html += '<button class="small" onclick="goHome()">← Volver</button>';
+    $('list').innerHTML = html;
+  };
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', installFinalFichaOverrides);
+} else {
+  installFinalFichaOverrides();
 }
 
 window.STATUS = STATUS;
