@@ -70,6 +70,7 @@ async function all() {
   const { data, error } = await supa
     .from('fichas_creator')
     .select('*')
+    .neq('status', STATUS.SENT)
     .order('updated_at', { ascending: false });
 
   if (error) {
@@ -78,7 +79,9 @@ async function all() {
     return [];
   }
 
-  return (data || []).map(rowToDraft);
+  return (data || []).map(rowToDraft).filter(function(draft) {
+    return draft.status !== STATUS.SENT;
+  });
 }
 
 function write(arr) {
@@ -400,7 +403,7 @@ async function sendToAcuarioNexo() {
   current = draft;
 
   alert('Ficha pasada a AcuarioNexo');
-  showPreview();
+  showList();
 }
 
 function labelStatus(value) {
@@ -559,7 +562,7 @@ function installFinalFichaOverrides() {
     let html = '<h2>Mis fichas</h2>';
 
     if (!arr.length) {
-      html += '<p class="muted">Aún no hay fichas guardadas.</p>';
+      html += '<p class="muted">Aún no hay fichas pendientes.</p>';
     }
 
     arr.forEach(function(f) {
