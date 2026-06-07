@@ -1,0 +1,145 @@
+{
+  "schema_id": "acuarionexo.pez_marino.v1",
+  "schema_name": "Pez marino V1",
+  "purpose": "Estructura oficial para fichas de peces marinos usadas por NexoCreator y por la IA de AcuarioNexo.",
+  "rules": {
+    "visual_layer": "La portada puede contener nombre comun y cientifico. Si cover_contains_title es true, la interfaz no debe repetir esos textos debajo de la portada.",
+    "ia_layer": "Los datos IA son obligatorios para que AcuarioNexo pueda cruzar especie, parametros, acuario, inventario, medicamentos, alimentacion y avisos.",
+    "medical_layer": "Las enfermedades y tratamientos no sustituyen diagnostico veterinario. La IA debe presentar hipotesis, pasos seguros y advertencias, no tratamientos ciegos.",
+    "inventory_logic": "Si una enfermedad probable tiene tratamientos posibles, AcuarioNexo debe buscar primero en inventario del usuario antes de recomendar compra o uso.",
+    "dose_logic": "Las dosis nunca se guardan como texto libre sin unidad. Deben expresarse con unidad, base de calculo y volumen objetivo para calcular segun litros reales del acuario."
+  },
+  "required_top_level_fields": [
+    "id",
+    "schema",
+    "status",
+    "display",
+    "category",
+    "identity",
+    "sections",
+    "ia"
+  ],
+  "structure": {
+    "id": "string: identificador unico, por ejemplo amphiprion-ocellaris-v1",
+    "schema": "acuarionexo.pez_marino.v1",
+    "status": "BORRADOR | EN_REVISION | VALIDADA | ENVIADA_A_ACUARIONEXO",
+    "display": {
+      "cover_contains_title": "boolean",
+      "hide_text_below_cover": "boolean",
+      "use_real_species_photo_in_final": "boolean",
+      "cover_image": "string|null: portada maquetada o base64/URL comprimida",
+      "species_photo": "string|null: foto real de especie para biblioteca final"
+    },
+    "category": "pez_marino",
+    "identity": {
+      "common_name": "string",
+      "scientific_name": "string",
+      "family": "string|null",
+      "genus": "string|null",
+      "species": "string|null",
+      "common_group": "string|null: payaso, cirujano, gobio, blenio, cardenal...",
+      "origin": "string|null",
+      "source_confidence": "alta | media | baja"
+    },
+    "sections": {
+      "summary": "string",
+      "habitat": "string",
+      "aquarium": "string",
+      "feeding": "string",
+      "compatibility": "string",
+      "health": "string",
+      "purchase": "string",
+      "mistakes": "string",
+      "curiosities": "string",
+      "sources": "string"
+    },
+    "ia": {
+      "requirements": {
+        "minimum_liters": "number|null",
+        "recommended_liters": "number|null",
+        "temperature_c": { "min": "number|null", "max": "number|null" },
+        "salinity_sg": { "min": "number|null", "max": "number|null" },
+        "ph": { "min": "number|null", "max": "number|null" },
+        "kh_dkh": { "min": "number|null", "max": "number|null" },
+        "no3_mg_l": { "ideal_max": "number|null", "warning_above": "number|null" },
+        "po4_mg_l": { "ideal_max": "number|null", "warning_above": "number|null" },
+        "oxygen": "normal | alto_recomendado | sensible | desconocido",
+        "maturity_required": "nuevo_estable | maduro | muy_maduro | desconocido"
+      },
+      "behavior": {
+        "difficulty": "facil | media | dificil | experto",
+        "aggression": "baja | media | alta | territorial",
+        "swimming_zone": ["superior", "media", "inferior", "roca", "arena"],
+        "social_structure": "solo | pareja | grupo | cardumen | variable",
+        "jump_risk": "bajo | medio | alto",
+        "reef_safe": "true | false | caution",
+        "coral_risk": "ninguno | bajo | medio | alto",
+        "invertebrate_risk": "ninguno | bajo | medio | alto",
+        "plant_or_macroalgae_risk": "ninguno | bajo | medio | alto"
+      },
+      "compatibility_rules": {
+        "compatible_groups": [],
+        "caution_groups": [],
+        "incompatible_groups": [],
+        "same_species_rule": "string",
+        "similar_species_rule": "string"
+      },
+      "feeding_rules": {
+        "diet_type": "carnivoro | omnivoro | herbivoro | planctivoro | especializado",
+        "foods": [],
+        "feeding_frequency": "string",
+        "special_notes": "string|null",
+        "risk_if_not_fed": "bajo | medio | alto"
+      },
+      "health_rules": {
+        "sensitive_to": [],
+        "common_diseases": [],
+        "stress_signs": [],
+        "urgent_signs": [],
+        "quarantine_recommended": "true | false | conditional"
+      },
+      "disease_logic": [
+        {
+          "disease_id": "string",
+          "disease_name": "string",
+          "symptoms": [],
+          "differential_diagnosis": [],
+          "risk_level": "bajo | medio | alto | urgente",
+          "first_actions": [],
+          "inventory_checks": [],
+          "treatment_options": [
+            {
+              "treatment_id": "string",
+              "medication_or_method": "string",
+              "use_context": "hospital | display | quarantine | freshwater_dip | supportive",
+              "dose_model": {
+                "requires_product_match": "boolean",
+                "dose_per_liter": "number|null",
+                "dose_unit": "ml | gotas | mg | comprimido | segun_fabricante | none",
+                "base_volume_l": "number|null",
+                "duration_days": "number|null",
+                "repeat_interval_hours": "number|null"
+              },
+              "warnings": [],
+              "remove_during_treatment": [],
+              "notes": "string|null"
+            }
+          ]
+        }
+      ],
+      "acuarionexo_actions": {
+        "on_add_to_aquarium": [],
+        "on_parameter_out_of_range": [],
+        "on_symptom_reported": [],
+        "on_inventory_match": [],
+        "on_no_inventory_match": []
+      }
+    },
+    "review": {
+      "review_status": "pendiente | revisada | validada",
+      "reviewed_by": "string|null",
+      "review_date": "string|null",
+      "source_notes": "string|null"
+    }
+  }
+}
