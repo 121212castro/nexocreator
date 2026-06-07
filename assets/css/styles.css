@@ -192,6 +192,16 @@ textarea {
   padding: 14px;
 }
 
+/* La portada ya contiene el texto elegido dentro de la imagen.
+   No se repiten nombre común, científico, categoría ni estado debajo de la foto. */
+.listBody h3,
+.listBody p,
+.fichaFinal > h1,
+.fichaFinal > .scientific,
+.fichaFinal > .muted {
+  display: none;
+}
+
 .preview h1 {
   font-size: 32px;
   margin: 12px 0 0;
