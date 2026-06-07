@@ -157,6 +157,79 @@ textarea {
   padding: 20px;
 }
 
+.categoryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.templateButton {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  align-items: start;
+  text-align: left;
+  padding: 18px;
+  min-height: auto;
+}
+
+.templateIcon {
+  grid-row: span 2;
+  font-size: 28px;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.templateTitle {
+  display: block;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.templateText {
+  display: block;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.sectionIntro {
+  margin: 18px 0 10px;
+}
+
+.editorBlock {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 12px;
+  margin: 12px 0;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.editorBlock summary {
+  cursor: pointer;
+  font-size: 19px;
+  font-weight: 850;
+  padding: 4px 0;
+}
+
+.editorBlock textarea {
+  min-height: 130px;
+}
+
+.speciesPhotoFinal {
+  margin-top: 14px;
+}
+
+.fichaFinalSection summary {
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 900;
+  padding: 8px 0;
+}
+
 .listItem {
   border: 1px solid var(--line);
   border-radius: 22px;
@@ -239,5 +312,22 @@ textarea {
   .logo {
     width: 102px;
     height: 102px;
+  }
+
+  .templateButton {
+    grid-template-columns: auto 1fr;
+    padding: 16px;
+  }
+
+  .templateIcon {
+    font-size: 24px;
+  }
+
+  .templateTitle {
+    font-size: 20px;
+  }
+
+  .templateText {
+    font-size: 14px;
   }
 }
