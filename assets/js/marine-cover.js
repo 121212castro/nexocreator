@@ -2,7 +2,7 @@
 // Plantilla oficial única para pez marino, coral e invertebrado marino.
 (function() {
   const MARINE_CATEGORIES = ['pez_marino', 'coral', 'invertebrado'];
-  const MARINE_BACKGROUND = 'assets/plantillas/PLANTILLA_MARINA_PREMIUM_BASE.svg';
+  const MARINE_BACKGROUND = 'assets/plantillas/PLANTILLA_MARINA_PREMIUM_V1.svg';
 
   function esc(value) {
     if (window.escapeHtml) return window.escapeHtml(value || '');
