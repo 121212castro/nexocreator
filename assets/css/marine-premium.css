@@ -1,0 +1,70 @@
+/* NexoCreator · PLANTILLA_MARINA_PREMIUM_V1 · estilos oficiales */
+
+.nexoMarineCoverScientific {
+  margin: 0;
+  color: #fff8e8;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: clamp(32px, 8vw, 54px);
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.72);
+}
+
+.nexoMarineCoverDivider {
+  width: min(210px, 58%);
+  height: 1px;
+  margin: 12px auto 10px;
+  background: linear-gradient(90deg, transparent, rgba(217, 178, 92, 0.98), transparent);
+  box-shadow: 0 0 12px rgba(217, 178, 92, 0.28);
+}
+
+.nexoMarineCoverCommon {
+  margin: 0;
+  color: #d9b25c;
+  font-size: clamp(17px, 4.5vw, 24px);
+  font-style: normal;
+  font-weight: 760;
+  letter-spacing: 0.03em;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.66);
+}
+
+.nexoMarineCoverText h1.nexoMarineCoverScientific {
+  color: #fff8e8;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.nexoMarineCoverText p.nexoMarineCoverCommon {
+  color: #d9b25c;
+  font-style: normal;
+  font-weight: 760;
+}
+
+.nexoMarineCoverPhotoWrap {
+  min-height: 280px;
+  padding: 56px 24px 10px;
+}
+
+.nexoMarineCoverAnimal {
+  max-width: min(86%, 520px);
+  max-height: 270px;
+}
+
+@media (max-width: 520px) {
+  .nexoMarineCoverScientific {
+    font-size: clamp(30px, 9vw, 44px);
+  }
+
+  .nexoMarineCoverPhotoWrap {
+    min-height: 230px;
+    padding: 48px 16px 8px;
+  }
+
+  .nexoMarineCoverAnimal {
+    max-width: 90%;
+    max-height: 210px;
+  }
+}
