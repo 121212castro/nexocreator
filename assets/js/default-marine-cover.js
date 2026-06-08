@@ -65,5 +65,19 @@
     };
   }
 
+  window.refreshApp = async function() {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(function(registration) {
+        return registration.unregister();
+      }));
+    }
+    if (window.caches) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(function(key) { return caches.delete(key); }));
+    }
+    location.reload();
+  };
+
   applyDefaultCover(window.current);
 })();
