@@ -80,4 +80,46 @@
   }
 
   window.renderFichaFinal = renderFichaFinalMarine;
+
+  window.showPreview = function() {
+    const draft = typeof window.collect === 'function' ? window.collect() : window.current;
+    if (typeof window.hideAll === 'function') window.hideAll();
+    const preview = document.getElementById('preview');
+    if (!preview) return;
+    preview.innerHTML =
+      '<button class="small" onclick="openEditor(window.current)">← Editar</button>' +
+      renderFichaFinalMarine(draft) +
+      (typeof window.transitionButtons === 'function' ? window.transitionButtons(draft) : '');
+    preview.classList.remove('hidden');
+  };
+
+  const previousOpenFinalById = window.openFinalById;
+  window.openFinalById = async function(id) {
+    if (!window.supa || typeof window.rowToDraft !== 'function') {
+      if (previousOpenFinalById) return previousOpenFinalById(id);
+      return;
+    }
+    const result = await window.supa
+      .from('fichas_creator')
+      .select('*')
+      .eq('id', id)
+      .limit(1);
+    const row = (result.data || [])[0];
+    if (result.error || !row) {
+      alert('No se pudo abrir la ficha: ' + ((result.error && result.error.message) || 'sin datos'));
+      return;
+    }
+    const draft = window.rowToDraft(row);
+    window.current = draft;
+    if (typeof window.hideAll === 'function') window.hideAll();
+    const preview = document.getElementById('preview');
+    if (!preview) return;
+    preview.innerHTML =
+      '<button class="small" onclick="showList()">← Mis fichas</button>' +
+      renderFichaFinalMarine(draft) +
+      '<button class="primary" onclick="openEditor(window.current)">✏️ Editar ficha</button>' +
+      (typeof window.transitionButtons === 'function' ? window.transitionButtons(draft) : '') +
+      '<button class="small danger" onclick="deleteFicha(\'' + draft.id + '\')">🗑️ Borrar</button>';
+    preview.classList.remove('hidden');
+  };
 })();
