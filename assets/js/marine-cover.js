@@ -1,11 +1,12 @@
-// NexoCreator · portadas marinas automáticas
+// NexoCreator · PLANTILLA_MARINA_PREMIUM_V1
+// Plantilla oficial única para pez marino, coral e invertebrado marino.
 (function() {
   const MARINE_CATEGORIES = ['pez_marino', 'coral', 'invertebrado'];
   const MARINE_BACKGROUND = 'assets/plantillas/PLANTILLA_MARINA_PREMIUM_BASE.svg';
 
   function esc(value) {
     if (window.escapeHtml) return window.escapeHtml(value || '');
-    return String(value || '').replace(/[&<>\"]/g, function(match) {
+    return String(value || '').replace(/[&<>"]/g, function(match) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[match];
     });
   }
@@ -39,18 +40,20 @@
   }
 
   function marineCover(draft, speciesPhoto) {
-    const categoryLabel = labelCategory(draft.category || '');
+    const scientificName = draft.scientific_name || draft.common_name || 'Ficha sin nombre';
+    const commonName = draft.common_name || '';
+
     return '' +
-      '<section class="nexoMarineCover" aria-label="Portada marina">' +
-        '<img class="nexoMarineCoverBg" src="' + MARINE_BACKGROUND + '" alt="Fondo marino">' +
-        '<div class="nexoMarineCoverShade"></div>' +
-        '<div class="nexoMarineCoverBadge">' + esc(categoryLabel) + '</div>' +
+      '<section class="nexoMarineCover plantillaMarinaPremiumV1" aria-label="PLANTILLA_MARINA_PREMIUM_V1">' +
+        '<img class="nexoMarineCoverBg" src="' + MARINE_BACKGROUND + '" alt="Fondo reef azul profundo">' +
+        '<div class="nexoMarineCoverShade" aria-hidden="true"></div>' +
         '<div class="nexoMarineCoverPhotoWrap">' +
-          (speciesPhoto ? '<img class="nexoMarineCoverAnimal" src="' + speciesPhoto + '" alt="foto real de la especie">' : '<div class="nexoMarineCoverAnimalEmpty">Sin foto real</div>') +
+          (speciesPhoto ? '<img class="nexoMarineCoverAnimal" src="' + speciesPhoto + '" alt="imagen principal">' : '<div class="nexoMarineCoverAnimalEmpty">Añade imagen principal</div>') +
         '</div>' +
         '<div class="nexoMarineCoverText">' +
-          '<h1>' + esc(draft.common_name || 'Ficha sin nombre') + '</h1>' +
-          '<p>' + esc(draft.scientific_name || '') + '</p>' +
+          '<h1 class="nexoMarineCoverScientific">' + esc(scientificName) + '</h1>' +
+          '<div class="nexoMarineCoverDivider" aria-hidden="true"></div>' +
+          '<p class="nexoMarineCoverCommon">' + esc(commonName) + '</p>' +
         '</div>' +
       '</section>';
   }
