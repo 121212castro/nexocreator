@@ -1,4 +1,4 @@
-const VERSION='nexocreator-v6-supabase-only';
+const VERSION='nexocreator-v7-marine-cover-default';
 
 self.addEventListener('install',event=>{
  self.skipWaiting();
