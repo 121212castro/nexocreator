@@ -1,4 +1,4 @@
-const VERSION='nexocreator-v9-force-marine-cover-refresh';
+const VERSION='nexocreator-v10-direct-jpeg-marine-cover';
 
 self.addEventListener('install',event=>{
  self.skipWaiting();
