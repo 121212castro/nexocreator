@@ -11,74 +11,13 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
-  <div class="app">
-    <section id="home">
-      <div class="top">
-        <img class="logo" src="icons/book-fish.svg" alt="NexoCreator">
-        <h1 class="title">NexoCreator</h1>
-        <p class="sub">Creador de fichas</p>
-      </div>
-      <div class="card">
-        <button class="primary" onclick="showNew()">➕ Nueva ficha</button>
-        <button onclick="showList()">📚 Mis fichas</button>
-        <button onclick="refreshApp()">Refrescar app</button>
-        <input id="photoStarter" type="file" accept="image/*" onchange="startFromPhoto(event)">
-      </div>
-    </section>
-
-    <section id="newMenu" class="hidden card"></section>
-
-    <section id="editor" class="hidden">
-      <div class="card">
-        <h2>Ficha</h2>
-
-        <p class="muted">Foto de portada</p>
-        <div id="coverBox"></div>
-        <input type="file" accept="image/*" onchange="replaceCover(event)">
-        <button onclick="removeCover()">Quitar portada</button>
-
-        <p class="muted">Foto real de la especie / producto</p>
-        <div id="speciesPhotoBox"></div>
-        <input type="file" accept="image/*" onchange="replaceSpeciesPhoto(event)">
-        <button onclick="removeSpeciesPhoto()">Quitar foto real</button>
-
-        <select id="category" onchange="changeCategory()">
-          <option value="pez_marino">Pez marino</option>
-          <option value="pez_dulce">Pez dulce</option>
-          <option value="coral">Coral</option>
-          <option value="invertebrado">Invertebrado</option>
-          <option value="planta">Planta</option>
-          <option value="microfauna">Microfauna</option>
-          <option value="sal">Sal</option>
-          <option value="medicamento">Medicamento</option>
-          <option value="alimento">Alimento</option>
-          <option value="equipamiento">Equipamiento</option>
-        </select>
-
-        <input id="commonName" placeholder="Nombre común">
-        <input id="scientificName" placeholder="Nombre científico / nombre técnico">
-
-        <div id="sectionFields"></div>
-
-        <button class="primary" onclick="saveDraft()">Guardar</button>
-        <button onclick="showPreview()">Vista previa</button>
-        <button onclick="exportCurrent()">Exportar JSON</button>
-        <button class="small" onclick="goHome()">← Inicio</button>
-      </div>
-    </section>
-
-    <section id="list" class="hidden card"></section>
-    <section id="preview" class="hidden card preview"></section>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    window.ACUARIONEXO_CONFIG = {
-      SUPABASE_URL: "https://fpykunamxygclolnjnke.supabase.co",
-      SUPABASE_KEY: "sb_publishable_FICmG_EDURKDibSrG0R2EA_kRqaHNe-"
-    };
-  </script>
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/image-compressor.js"></script>
+<div class="app">...</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.ACUARIONEXO_CONFIG={SUPABASE_URL:"https://fpykunamxygclolnjnke.supabase.co",SUPABASE_KEY:"sb_publishable_FICmG_EDURKDibSrG0R2EA_kRqaHNe-"};
+</script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/marine-cover.js"></script>
+<script src="assets/js/image-compressor.js"></script>
 </body>
 </html>
