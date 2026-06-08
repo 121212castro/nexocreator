@@ -296,6 +296,120 @@ textarea {
   height: 25px;
 }
 
+/* ===== NexoCreator · Componente oficial de portada marina =====
+   Lo genera assets/js/marine-cover.js para pez marino, coral e invertebrado.
+   Mantiene el fondo dentro de su contenedor y evita desbordes de imagen. */
+
+.nexoMarineCover {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  overflow: hidden;
+  background: #062033;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  isolation: isolate;
+}
+
+.nexoMarineCoverBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+}
+
+.nexoMarineCoverShade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.18), transparent 34%),
+    linear-gradient(to bottom, rgba(0, 24, 38, 0.12), rgba(0, 0, 0, 0.58));
+  pointer-events: none;
+}
+
+.nexoMarineCoverBadge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 3;
+  max-width: calc(100% - 32px);
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.38);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.2;
+  backdrop-filter: blur(8px);
+}
+
+.nexoMarineCoverPhotoWrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 28px 18px;
+}
+
+.nexoMarineCoverAnimal {
+  display: block;
+  max-width: min(78%, 440px);
+  max-height: 240px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.42));
+}
+
+.nexoMarineCoverAnimalEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(78%, 360px);
+  min-height: 160px;
+  border: 1px dashed rgba(255, 255, 255, 0.36);
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--muted);
+  font-weight: 750;
+  text-align: center;
+}
+
+.nexoMarineCoverText {
+  position: relative;
+  z-index: 2;
+  padding: 18px 24px 28px;
+  text-align: center;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.55);
+}
+
+.nexoMarineCoverText h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(28px, 7vw, 46px);
+  font-weight: 950;
+  line-height: 1.02;
+}
+
+.nexoMarineCoverText p {
+  margin: 8px 0 0;
+  color: rgba(246, 251, 255, 0.88);
+  font-size: clamp(16px, 4vw, 22px);
+  font-style: italic;
+  font-weight: 650;
+}
+
 @media (max-width: 520px) {
   .app {
     padding: 16px;
@@ -329,5 +443,30 @@ textarea {
 
   .templateText {
     font-size: 14px;
+  }
+
+  .nexoMarineCover {
+    min-height: 340px;
+    border-radius: 22px;
+  }
+
+  .nexoMarineCoverBadge {
+    top: 12px;
+    left: 12px;
+    max-width: calc(100% - 24px);
+  }
+
+  .nexoMarineCoverPhotoWrap {
+    min-height: 210px;
+    padding: 60px 18px 12px;
+  }
+
+  .nexoMarineCoverAnimal {
+    max-width: 86%;
+    max-height: 190px;
+  }
+
+  .nexoMarineCoverText {
+    padding: 14px 18px 22px;
   }
 }
