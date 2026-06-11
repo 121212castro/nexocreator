@@ -1,4 +1,4 @@
-const VERSION='nexocreator-v11-image-fit-update';
+const VERSION='nexocreator-v12-uncropped-image-display';
 
 self.addEventListener('install',event=>{
  self.skipWaiting();
