@@ -138,29 +138,27 @@ textarea {
 
 .cover {
   width: 100%;
-  aspect-ratio: 16 / 9;
   height: auto;
-  object-fit: cover;
+  max-height: none;
+  object-fit: contain;
   object-position: center;
   border-radius: 22px;
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.18);
   display: block;
 }
 
 #coverBox .cover,
-.fichaFinal > .cover:first-child {
-  aspect-ratio: 16 / 9;
-  max-height: none;
-  object-fit: cover;
+.fichaFinal > .cover:first-child,
+.listCover {
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.18);
 }
 
 #speciesPhotoBox .cover,
 .speciesPhotoFinal {
-  aspect-ratio: 4 / 5;
-  max-height: none;
   object-fit: contain;
-  background: rgba(0, 0, 0, 0.42);
+  background: #fff;
 }
 
 .placeholder {
@@ -270,16 +268,12 @@ textarea {
 
 .listCover {
   width: 100%;
-  aspect-ratio: 16 / 9;
   height: auto;
-  object-fit: cover;
-  object-position: center;
   display: block;
-  background: rgba(0, 0, 0, 0.35);
 }
 
 .listCoverEmpty {
-  aspect-ratio: 16 / 9;
+  height: 210px;
   display: flex;
   align-items: center;
   justify-content: center;
