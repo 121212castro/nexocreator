@@ -3,6 +3,7 @@
 (function() {
   const MAX_IMAGE_SIZE = 1200;
   const JPEG_QUALITY = 0.8;
+  const REFRESH_VERSION = '20260612-0145';
 
   function readAsDataUrl(file) {
     return new Promise(function(resolve, reject) {
@@ -46,6 +47,8 @@
     canvas.height = size.height;
 
     const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, size.width, size.height);
     ctx.drawImage(img, 0, 0, size.width, size.height);
 
     return canvas.toDataURL('image/jpeg', JPEG_QUALITY);
@@ -58,4 +61,18 @@
   } catch (err) {
     console.warn('No se pudo reasignar readFile global:', err);
   }
+
+  window.refreshApp = async function() {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(function(registration) {
+        return registration.unregister();
+      }));
+    }
+    if (window.caches) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(function(key) { return caches.delete(key); }));
+    }
+    location.href = location.pathname + '?v=' + REFRESH_VERSION;
+  };
 })();
