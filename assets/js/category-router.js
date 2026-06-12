@@ -16,10 +16,16 @@
     return CATEGORY_TO_LIBRARY[value] || value || 'other';
   }
 
+  function finalCoverPhoto(draft) {
+    return draft.cover_photo || draft.coverPhoto || draft.cover ||
+      (draft.media && (draft.media.cover_photo || draft.media.coverPhoto || draft.media.cover)) ||
+      (draft.images && (draft.images.cover_photo || draft.images.coverPhoto || draft.images.cover)) || '';
+  }
+
   function finalSpeciesPhoto(draft) {
-    return draft.species_photo || draft.speciesPhoto ||
-      (draft.media && (draft.media.species_photo || draft.media.speciesPhoto)) ||
-      (draft.images && (draft.images.species_photo || draft.images.speciesPhoto)) || '';
+    return draft.species_photo || draft.speciesPhoto || draft.real_photo || draft.realPhoto ||
+      (draft.media && (draft.media.species_photo || draft.media.speciesPhoto || draft.media.real_photo || draft.media.realPhoto)) ||
+      (draft.images && (draft.images.species_photo || draft.images.speciesPhoto || draft.images.real_photo || draft.images.realPhoto)) || '';
   }
 
   function getSupabaseClient() {
@@ -54,6 +60,8 @@
     }
 
     const category = libraryCategory(draft.category);
+    const coverPhoto = finalCoverPhoto(draft) || null;
+    const speciesPhoto = finalSpeciesPhoto(draft) || null;
     const libraryRow = {
       user_id: user.id,
       title: title,
@@ -61,7 +69,9 @@
       category: category,
       source_category: draft.category || null,
       description: s.summary || null,
-      photo_url: finalSpeciesPhoto(draft) || null,
+      cover_photo_url: coverPhoto,
+      species_photo_url: speciesPhoto,
+      photo_url: speciesPhoto || coverPhoto,
       feeding: s.feeding || null,
       compatibility: s.compatibility || null,
       references_text: s.sources || null,
@@ -97,7 +107,7 @@
       return;
     }
 
-    draft.status = window.STATUS ? window.STATUS.SENT : 'ENVIADA_A_ACUARIONEXO';
+    draft.status = window.STATUS ? window.STATUS.SENT : 'ENVIADA_A_ACUARIO_NEXO';
     draft.sent_to_acuarionexo_at = new Date().toISOString();
     if (window.saveFicha) await window.saveFicha(draft);
     window.current = draft;
