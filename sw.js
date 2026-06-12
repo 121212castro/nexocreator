@@ -1,4 +1,4 @@
-const VERSION='nexocreator-v14-paste-importer';
+const VERSION='nexocreator-v15-category-router';
 
 self.addEventListener('install',event=>{
  self.skipWaiting();
