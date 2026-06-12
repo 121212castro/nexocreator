@@ -104,6 +104,19 @@
       (draft.images && (draft.images.species_photo || draft.images.speciesPhoto || draft.images.real_photo || draft.images.realPhoto)) || '';
   }
 
+  function completeFichaJson(draft, names, coverPhoto, speciesPhoto) {
+    const copy = JSON.parse(JSON.stringify(draft || {}));
+    copy.common_name = names.common_name || names.title || '';
+    copy.scientific_name = names.scientific_name || '';
+    copy.title = names.title;
+    copy.cover_photo_url = coverPhoto || null;
+    copy.species_photo_url = speciesPhoto || null;
+    copy.cover_image = coverPhoto || copy.cover_image || null;
+    copy.species_photo = speciesPhoto || copy.species_photo || null;
+    copy.sent_to_acuarionexo_at = new Date().toISOString();
+    return copy;
+  }
+
   function getSupabaseClient() {
     if (!window.__nexoCategoryRouterSupa) {
       window.__nexoCategoryRouterSupa = window.supabase.createClient(
@@ -135,6 +148,7 @@
     const category = libraryCategory(draft.category);
     const coverPhoto = finalCoverPhoto(draft) || null;
     const speciesPhoto = finalSpeciesPhoto(draft) || null;
+    const fichaJson = completeFichaJson(draft, names, coverPhoto, speciesPhoto);
     const libraryRow = {
       user_id: user.id,
       title: title,
@@ -149,6 +163,8 @@
       compatibility: s.compatibility || null,
       references_text: s.sources || null,
       parameters: s.parameters ? { text: s.parameters } : {},
+      reef_safe: s.reef_safe || null,
+      ficha_json: fichaJson,
       updated_at: new Date().toISOString()
     };
 
