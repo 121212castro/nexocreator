@@ -1,4 +1,4 @@
-const VERSION='nexocreator-v13-runtime-image-fit-overrides';
+const VERSION='nexocreator-v14-paste-importer';
 
 self.addEventListener('install',event=>{
  self.skipWaiting();
