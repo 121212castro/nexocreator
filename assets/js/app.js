@@ -191,6 +191,22 @@ const CATEGORY_TREE = {
       ['risks', 'Riesgos y errores', 'Fallos habituales, sobredimensión, ruido, calor y seguridad.'],
       ['sources', 'Fuentes', 'Manual, ficha oficial y fecha de revisión.']
     ]
+  },
+  test: {
+    icon: '🧪',
+    label: 'Test',
+    description: 'Ficha de test de acuario: uso, lectura, rangos, conservación, errores y compatibilidad con AcuarioNexo.',
+    sections: [
+      ['summary', 'Resumen rápido', 'Qué mide, para qué sirve, tipo de acuario y cuándo usarlo.'],
+      ['identity', 'Identificación', 'Marca, producto, parámetro medido, formato y fabricante.'],
+      ['parameters', 'Parámetros medidos', 'Unidad, rango de lectura, precisión, escala y equivalencias.'],
+      ['reading', 'Lectura', 'Cómo tomar la muestra, pasos de lectura, tiempos, colorimetría y registro.'],
+      ['range', 'Rangos recomendados', 'Rangos orientativos por acuario marino, reef, dulce, hospital o cuarentena.'],
+      ['use', 'Uso recomendado', 'Frecuencia, momentos importantes y cuándo repetir medición.'],
+      ['risks', 'Errores y advertencias', 'Errores frecuentes, interferencias, caducidad, contaminación y seguridad.'],
+      ['storage', 'Conservación', 'Almacenamiento, caducidad, limpieza y cuidado de reactivos.'],
+      ['sources', 'Fuentes', 'Ficha oficial, manual del fabricante y fecha de revisión.']
+    ]
   }
 };
 
@@ -200,6 +216,7 @@ const supa = window.supabase.createClient(
   window.ACUARIONEXO_CONFIG.SUPABASE_URL,
   window.ACUARIONEXO_CONFIG.SUPABASE_KEY
 );
+window.supa = supa;
 
 function $(id) {
   return document.getElementById(id);
@@ -633,7 +650,8 @@ function libraryCategory(value) {
     sal: 'other',
     medicamento: 'other',
     alimento: 'other',
-    equipamiento: 'other'
+    equipamiento: 'other',
+    test: 'test'
   }[value] || value || 'other';
 }
 

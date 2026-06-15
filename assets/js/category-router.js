@@ -9,7 +9,8 @@
     medicamento: 'medicine',
     sal: 'product',
     alimento: 'product',
-    equipamiento: 'equipment'
+    equipamiento: 'equipment',
+    test: 'test'
   };
 
   function libraryCategory(value) {
